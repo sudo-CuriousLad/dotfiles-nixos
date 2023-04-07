@@ -11,12 +11,18 @@ in {
     ];
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.enable = false;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  boot.loader.grub = {
+    devices = [ "nodev" ];
+    enable = true;
+    efiSupport = true;
+    version = 2;
+    useOSProber = true;
+  };
 
   networking.hostName = "zephyr"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -150,7 +156,7 @@ in {
         doas = {
             enable = true;
             extraRules = [{
-                users = [ "notus" ];
+                users = [ "curiouslad" ];
                 keepEnv = true;
                 persist = true;
             }];
@@ -159,6 +165,25 @@ in {
         # Extra security
         protectKernelImage = true;
   };
+
+  hardware = {
+        bluetooth.enable = false;
+        opengl = {
+            enable = true;
+            driSupport = true;
+        };
+  };
+
+  networking = {
+        wireless.iwd.enable = true;
+        firewall = {
+            enable = true;
+            allowedTCPPorts = [ 443 80 ];
+            allowedUDPPorts = [ 443 80 44857 ];
+            allowPing = false;
+       };
+  };
+
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
