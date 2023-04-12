@@ -17,8 +17,6 @@ in {
 
     home.packages = with pkgs; [
       jetbrains.idea-community
-      jetbrains.clion
-      rustup # needs to be globally installed for ide integration
     ];
 
   };

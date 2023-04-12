@@ -20,7 +20,7 @@ in {
             git python3 lua 
             mpv pqiv
             screen bandw maintenance
-            wf-recorder 
+            wf-recorder gnome-solanum
         ];
     };
 }

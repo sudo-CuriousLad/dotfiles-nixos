@@ -18,6 +18,7 @@
     prism-launcher.enable = true;
     dunst.enable = true;
     git.enable = true;
+    spotify.enable = true;
   };
   
 }

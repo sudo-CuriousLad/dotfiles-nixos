@@ -32,12 +32,15 @@ in {
 
   # Laptop-specific packages (the other ones are installed in `packages.nix`)
    environment.systemPackages = with pkgs; [
-    git
+    pkgs.git pkgs.wget pkgs.jetbrains.jdk 
   ];
 
-  nix.settings = {
-    substituters = ["https://hyprland.cachix.org"];
-    trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
+  nix = {
+    settings = {
+      substituters = ["https://hyprland.cachix.org"];
+      trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
+      experimental-features = [ "nix-command" "flakes" ];
+    };
   };
 
   fonts = {
@@ -55,6 +58,8 @@ in {
             };
         };
   };
+
+  
 
   # Enable networking
   networking.networkmanager.enable = true;
@@ -83,7 +88,8 @@ in {
   # Enable the KDE Plasma Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
   services.xserver.desktopManager.plasma5.enable = true;
-
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.nvidia.modesetting.enable = true;
   # Configure keymap in X11
   services.xserver = {
     layout = "us";
@@ -91,7 +97,6 @@ in {
   };
 
   # Enable CUPS to print documents.
-  services.printing.enable = true;
 
   # Enable sound with pipewire.
   sound.enable = true;
@@ -182,7 +187,13 @@ in {
             allowedUDPPorts = [ 443 80 44857 ];
             allowPing = false;
        };
-  };
+     };
+
+  services.printing.enable = true;
+  services.avahi.enable = true;
+  services.avahi.nssmdns = true;
+  # for a WiFi printer
+  services.avahi.openFirewall = true;
 
 
   # Enable the OpenSSH daemon.

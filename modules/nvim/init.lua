@@ -26,7 +26,8 @@ map('n', '<C-n>', ':Telescope live_grep <CR>', opts)
 map('n', '<C-f>', ':Telescope find_files <CR>', opts)
 map('n', 'j', 'gj', opts)
 map('n', 'k', 'gk', opts)
-map('n', ';', ':', { noremap = true } )
+map('n', ' ', ':', { noremap = true } )
+vim.api.nvim_command('inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\\<CR>"')
 
 g.mapleader = ' '
 

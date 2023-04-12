@@ -17,6 +17,7 @@
     ./prism-launcher/default.nix
     ./dunst/default.nix
     ./git/default.nix
+    ./spotify/default.nix
   ];
 }
 

@@ -21,6 +21,9 @@ in {
         home.packages = with pkgs; [
             rnix-lsp nixfmt # Nix
             sumneko-lua-language-server stylua # Lua
+            nodePackages.typescript-language-server
+            nodePackages.svelte-language-server
+            rust-analyzer
         ];
 
         programs.neovim = {
@@ -28,6 +31,17 @@ in {
             plugins = with pkgs.vimPlugins; [ 
                 vim-nix
                 plenary-nvim
+                vim-svelte
+                vim-javascript
+                html5-vim
+                coc-nvim
+                coc-svelte
+                coc-rust-analyzer
+                vim-endwise
+                auto-pairs
+                vim-commentary
+                nvim-ts-autotag
+                vim-closetag
                 {
                     plugin = jabuti-nvim;
                     config = "colorscheme jabuti";
@@ -55,7 +69,8 @@ in {
                         require('lspconfig').rust_analyzer.setup{}
                         require('lspconfig').sumneko_lua.setup{}
                         require('lspconfig').rnix.setup{}
-                        require('lspconfig').zk.setup{}
+                        require('lspconfig').svelte.setup{}
+                        require('lspconfig').tsserver.setup{}
                         EOF
                     '';
                 }
@@ -68,7 +83,11 @@ in {
                             enable = true,
                             additional_vim_regex_highlighting = false,
                         },
+                        autotag = {
+                            enable = true;
+                        }
                     }
+
                     EOF
                     '';
                 }

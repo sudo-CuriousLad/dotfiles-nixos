@@ -13,8 +13,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+
+    spicetify-nix.url = "github:the-argus/spicetify-nix";
+
   };
-  outputs = { nixpkgs, nur, hyprland, home-manager, ... }@inputs: {
+  outputs = {nixos-hardware, nixpkgs, nur, hyprland, home-manager, spicetify-nix, ... }@inputs: {
+
     nixosConfigurations.zephyr = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [ 
@@ -22,19 +27,21 @@
       hyprland.nixosModules.default
       home-manager.nixosModules.home-manager
       nur.nixosModules.nur
-      {programs.hyprland.enable = true;}
       {
 	home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.extraSpecialArgs = { inherit inputs;};
 	home-manager.users.curiouslad.imports = [
 	  modules/home-manager/home.nix
-      	  hyprland.homeManagerModules.default
-	  ./modules/config.nix
+          hyprland.homeManagerModules.default
+          spicetify-nix.homeManagerModule
+          ./modules/config.nix
+
         ];
         nixpkgs.overlays = [ nur.overlay ];
       }
-      ];
+      nixos-hardware.nixosModules.asus-zephyrus-ga401
+    ];
     };
   };
 }
