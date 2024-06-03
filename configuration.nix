@@ -3,7 +3,13 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }: let
-
+  nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
+    export __NV_PRIME_RENDER_OFFLOAD=1
+    export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export __VK_LAYER_NV_optimus=NVIDIA_only
+    exec "$@"
+  '';
 in {
   imports =
     [ # Include the results of the hardware scan.
@@ -18,7 +24,6 @@ in {
     devices = [ "nodev" ];
     enable = true;
     efiSupport = true;
-    version = 2;
     useOSProber = true;
   };
 
@@ -32,7 +37,13 @@ in {
 
   # Laptop-specific packages (the other ones are installed in `packages.nix`)
    environment.systemPackages = with pkgs; [
-    pkgs.git pkgs.wget pkgs.jetbrains.jdk 
+    pkgs.git pkgs.wget nvidia-offload 
+  ];
+
+  nixpkgs.config.permittedInsecurePackages  = [
+    "python-2.7.18.6"
+    "electron-12.2.3"
+    "electron-25.9.0"
   ];
 
   nix = {
@@ -40,14 +51,17 @@ in {
       substituters = ["https://hyprland.cachix.org"];
       trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
       experimental-features = [ "nix-command" "flakes" ];
+      trusted-users = [ "root" "curiouslad" ];
     };
   };
 
   fonts = {
-        fonts = with pkgs; [
+        packages = with pkgs; [
             jetbrains-mono
             roboto
             openmoji-color
+            migmix
+            noto-fonts-cjk
             (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
         ];
 
@@ -55,12 +69,26 @@ in {
             hinting.autohint = true;
             defaultFonts = {
               emoji = [ "OpenMoji Color" ];
+              serif = [ "Noto Serif CJK" ];
+              sansSerif = [ "Noto Sans CJK" ];
+              monospace = [ "Iosevka" ];
+
             };
-        };
+          };
+
+          fontDir.enable=true;
   };
 
+  systemd.user.services.autostarter = {
+    description = "...";
+    serviceConfig.PassEnvironment = "DISPLAY";
+    script = ''
+      {$pkgs.kdePackages.kclock}/bin/kclock
+      {$pkgs.foot}/bin/foot -s
+    '';
+    wantedBy = [ "default.target" ]; # starts after login
+  };
   
-
   # Enable networking
   networking.networkmanager.enable = true;
 
@@ -68,32 +96,33 @@ in {
   time.timeZone = "Asia/Kolkata";
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_IN";
+  i18n.defaultLocale = "en_US.UTF-8";
 
   i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_IN";
-    LC_IDENTIFICATION = "en_IN";
-    LC_MEASUREMENT = "en_IN";
-    LC_MONETARY = "en_IN";
-    LC_NAME = "en_IN";
-    LC_NUMERIC = "en_IN";
-    LC_PAPER = "en_IN";
-    LC_TELEPHONE = "en_IN";
-    LC_TIME = "en_IN";
+    LC_ADDRESS = "en_US.UTF-8";
+    LC_IDENTIFICATION = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
   };
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
   # Enable the KDE Plasma Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
-  services.xserver.desktopManager.plasma5.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.desktopManager.plasma6.enable = true;
+  # services.xserver.desktopManager.plasma5.enable = true;
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.nvidia.modesetting.enable = true;
+  # hardware.nvidia.modesetting.enable = true;
   # Configure keymap in X11
   services.xserver = {
-    layout = "us";
-    xkbVariant = "";
+    xkb.layout = "us";
+    xkb.variant = "";
   };
 
   # Enable CUPS to print documents.
@@ -114,6 +143,17 @@ in {
     # no need to redefine it in your config for now)
     #media-session.enable = true;
   };
+
+  # environment.etc = {
+	# "wireplumber/bluetooth.lua.d/51-bluez-config.lua".text = ''
+	# 	bluez_monitor.properties = {
+	# 		["bluez5.enable-sbc-xq"] = true,
+	# 		["bluez5.enable-msbc"] = true,
+	# 		["bluez5.enable-hw-volume"] = true,
+	# 		["bluez5.headset-roles"] = "[ hsp_hs hsp_ag hfp_hf hfp_ag ]"
+	# 	}
+	# '';
+  # };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
@@ -157,7 +197,7 @@ in {
   # List services that you want to enable:
 
    security = {
-        sudo.enable = false;
+        sudo.enable = true;
         doas = {
             enable = true;
             extraRules = [{
@@ -172,26 +212,34 @@ in {
   };
 
   hardware = {
-        bluetooth.enable = false;
+        bluetooth.enable = true;
         opengl = {
             enable = true;
             driSupport = true;
-        };
+          };
+          nvidia = {
+            prime = {
+            offload.enable = true;
+            nvidiaBusId = "PCI:1:0:0";
+            amdgpuBusId = "PCI:4:0:0";
+            };
+            modesetting.enable = true;
+          };
   };
 
   networking = {
-        wireless.iwd.enable = true;
+        # wireless.iwd.enable = true;
         firewall = {
             enable = true;
             allowedTCPPorts = [ 443 80 ];
             allowedUDPPorts = [ 443 80 44857 ];
             allowPing = false;
        };
-     };
+  };
 
   services.printing.enable = true;
   services.avahi.enable = true;
-  services.avahi.nssmdns = true;
+  services.avahi.nssmdns4 = true;
   # for a WiFi printer
   services.avahi.openFirewall = true;
 

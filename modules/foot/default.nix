@@ -10,8 +10,9 @@ in {
             enable = true;
             settings = {
                 main = {
-                    font = "JetBrainsMono Nerdfont:size=7:line-height=16px";
+                    font = "JetBrains Mono:size=7:line-height=24px";
                     pad = "12x12";
+                    dpi-aware = "yes";
                 };
                 colors = {
                     foreground = "d9e0ee";

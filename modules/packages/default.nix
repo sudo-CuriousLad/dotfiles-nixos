@@ -12,15 +12,27 @@ in {
     config = mkIf cfg.enable {
     	home.packages = with pkgs; [
             ripgrep ffmpeg 
-            exa htop fzf
-            pass gnupg bat
+            eza htop fzf 
+            gnupg bat
             unzip 
-            grim slurp slop
-            imagemagick age libnotify
+            grim slurp 
+            libnotify
             git python3 lua 
-            mpv pqiv
+            mpv 
             screen bandw maintenance
-            wf-recorder gnome-solanum
+            wf-recorder 
+            # davinci-resolve
+            obsidian
+            vscode
+            brave
+            buttercup-desktop tmux
+            ocs-url kdePackages.kclock
+            krita affine  
+            gsettings-desktop-schemas glib 
+            wacomtablet libwacom speechd 
+            lzip cachix
+
         ];
+
     };
 }

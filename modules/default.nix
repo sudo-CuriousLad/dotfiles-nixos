@@ -18,6 +18,10 @@
     ./dunst/default.nix
     ./git/default.nix
     ./spotify/default.nix
+    ./direnv/default.nix
+    ./langs/default.nix
+    ./vscode/default.nix
+    # ./krita/default.nix
   ];
 }
 

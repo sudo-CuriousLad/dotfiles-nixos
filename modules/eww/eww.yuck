@@ -10,7 +10,6 @@
 
     (box :valign "end" :hexpand false :vexpand true :orientation "v" :space-evenly false
       (battery)
-      (wifi)
       (mem :thickness 4 :icon "")
       (cpu :thickness 4 :icon "")
       (disk :thickness 4 :icon "")
@@ -64,6 +63,20 @@
 ;; ━━━ WIDGETS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ;; ━━━ MEMORY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+(defpoll checklist_j :interval "999h" "cat /home/curiouslad/stuff/checklist.json")
+(defwidget checklist []
+  (box :orientation "v" :class "checklist-box"
+    (for item in checklist_j
+      (box
+        (box :class "cl-text" :hexpand "true"
+          {item.name}
+        )
+      )
+    )
+  )
+)
+
+;; ━━━ MEMORY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 (defwidget dashbutton[]
   (button :class "reg-btn dashbutton" :onclick "eww open dashboard --toggle" "舘")
 )
@@ -111,17 +124,6 @@
 
 
 ;; ━━━ WIFI ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-(defpoll wifi :interval "30s" "./scripts/wifi.sh")
-
-(defwidget wifi []
- (box :vexpand false :hexpand false :orientation "v"
-   (label :text {wifi.icon}
-          :limit-width 10
-          :tooltip {wifi.status}
-          :class "wifi"
-    )
-  )
-)
 
 ;; ━━━ BATTERY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 (defpoll battery :interval "60s" "./scripts/battery.sh")
@@ -291,3 +293,15 @@
   :anchor "top left")
   :stacking "fg"
   (bar))
+
+(defwindow checklist
+    :monitor 0
+    :geometry (geometry 
+    :height "1080px" 
+    :width "50px"
+    :x "48px"
+    :y "0px"
+    :anchor "top left")
+    :stacking "bg"
+    :class "dashboard"
+    (checklist))

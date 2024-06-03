@@ -19,7 +19,7 @@ in {
         home.file.".config/nvim/settings.lua".source = ./init.lua;
         
         home.packages = with pkgs; [
-            rnix-lsp nixfmt # Nix
+            nixfmt # Nix
             sumneko-lua-language-server stylua # Lua
             nodePackages.typescript-language-server
             nodePackages.svelte-language-server
@@ -39,9 +39,16 @@ in {
                 coc-rust-analyzer
                 vim-endwise
                 auto-pairs
+                vim-floaterm
                 vim-commentary
-                nvim-ts-autotag
-                vim-closetag
+                {
+                  plugin = vim-closetag;
+                  config = "let g:closetag_filenames = '*.html,*.xhtml,*.jsx,*.svelte'";
+                }
+                {
+                  plugin = nvim-ts-autotag;
+                  config = "lua require('nvim-ts-autotag').setup()";
+                }
                 {
                     plugin = jabuti-nvim;
                     config = "colorscheme jabuti";
@@ -84,10 +91,10 @@ in {
                             additional_vim_regex_highlighting = false,
                         },
                         autotag = {
-                            enable = true;
-                        }
+                          enable = true,
+                          filetypes = {"html", "xml", "jsx", "svelte"},
+                        },
                     }
-
                     EOF
                     '';
                 }

@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs = {url = "github:NixOS/nixpkgs/nixos-unstable";};
     hyprland.url = "github:hyprwm/Hyprland";
 
     home-manager = {
@@ -24,8 +24,13 @@
       system = "x86_64-linux";
       modules = [ 
       ./configuration.nix
-      hyprland.nixosModules.default
       home-manager.nixosModules.home-manager
+      {
+        programs.hyprland.package = inputs.hyprland.packages."x86_64-linux".hyprland;
+      }
+      {
+        programs.hyprland.enable = false;
+      }
       nur.nixosModules.nur
       {
 	home-manager.useGlobalPkgs = true;
@@ -42,6 +47,8 @@
       }
       nixos-hardware.nixosModules.asus-zephyrus-ga401
     ];
+
+    specialArgs = {inherit inputs;};
     };
   };
 }
